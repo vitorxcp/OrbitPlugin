@@ -1,0 +1,102 @@
+# Configurações do Discord
+discord:
+  enabled: false
+  token: "SEU_TOKEN_DO_BOT_AQUI"
+  channel: "ID_DO_CANAL_DE_PUNICOES"
+  embeds:
+    addpunishments:
+      title: "Punição Aplicada"
+      description: |
+        **Jogador:** %player%
+        **Staff:** %staff%
+        **Motivo:** %reason%
+        **Tipo:** %type%
+        **Duração:** %time%
+        **Data:** %date%
+      color: "#FF0000"
+      thumbnail: "https://example.com/thumbnail.png"
+      footer: "Sistema de Punições - %date%"
+      timestamp: true
+      fields:
+        player_info:
+          name: "Informações do Jogador"
+          value: "```Jogador: %player%\nID: %id%```"
+          inline: true
+        punishment_info:
+          name: "Informações da Punição"
+          value: "```Tipo: %type%\nDuração: %time%\nMotivo: %reason%```"
+          inline: true
+
+    removepunishments:
+      title: "Punição Removida"
+      description: |
+        **Jogador:** %player%
+        **Staff:** %staff%
+        **Tipo:** %type%
+        **Data:** %date%
+      color: "#39B906"
+      thumbnail: "https://example.com/thumbnail.png"
+      footer: "Sistema de Punições - %date%"
+      timestamp: true
+      fields:
+        player_info:
+          name: "Informações do Jogador"
+          value: "```Jogador: %player%\nID: %id%```"
+          inline: true
+        punishment_info:
+          name: "Informações da Punição"
+          value: "```Tipo: %type%\nDuração: %time%\nMotivo: %reason%```"
+          inline: true
+
+# Motivos pré-definidos para a GUI
+motivos:
+  - "Hack/Clientes ilegais"
+  - "Abuso de Bugs/Exploits"
+  - "Comportamento Tóxico"
+  - "Spam no Chat"
+  - "Publicidade não autorizada"
+  - "Assédio a outros jogadores"
+  - "Divulgação de informações pessoais"
+  - "Evasão de punição"
+  - "Nome inadequado"
+  - "Skin inadequada"
+
+# Mensagens personalizadas
+mensagens:
+  ban: "§cVocê foi banido!\n\n§fMotivo: §e%reason%\n§fStaff: §e%staff%\n§fDuração: §e%time%\n§fData: §e%date%\n\n§7Se acha que isso foi um engano, entre em nosso Discord."
+  kick: "§cVocê foi kickado!\n\n§fMotivo: §e%reason%\n§fStaff: §e%staff%\n§fData: §e%date%\n\n§7Você pode reconectar ao servidor."
+  mute: "§cVocê está mutado!\n\n§fMotivo: §e%reason%\n§fStaff: §e%staff%\n§fDuração: §e%time%\n§fData: §e%date%\n\n§7Você não pode enviar mensagens no chat."
+  ban_ip: "§cSeu IP foi banido!\n\n§fMotivo: §e%reason%\n§fStaff: §e%staff%\n§fDuração: §e%time%\n§fData: §e%date%\n\n§7Contate a staff em nosso Discord."
+
+# Configurações do sistema
+configuracoes:
+  # Tempo máximo de punição (em milissegundos), -1 para ilimitado
+  tempo_maximo_ban: -1
+  tempo_maximo_mute: 2592000000  # 30 dias em milissegundos
+
+  # Broadcast de punições para staff
+  broadcast_staff: true
+  permission_staff: "synccordvx.staff"
+
+  # Auto-remover punições expiradas
+  auto_remover_expirados: true
+  intervalo_verificacao: 300  # 5 minutos em segundos
+
+maintenance:
+  enabled: false
+  kick-message: "&cO servidor está em manutenção no momento.\n&cPor favor, tente novamente mais tarde!"
+  whitelist:
+    - "BrenoCueio"
+  motd:
+    linha1: "§c§lORBIT §8| §c§lMANUTENÇÃO"
+    linha2: "§7Estamos preparando novidades incríveis! Voltamos já."
+
+# Sistema de NPCs para o RankUP
+rankup-npcs:
+  # Aqui você mapeia o NÚMERO do rank para o NOME que você quer exibir
+  rank-names:
+    1: 'Novato'
+    2: 'Viajante'
+    3: 'Explorador'
+    4: 'Guerreiro'
+    5: 'Mestre'

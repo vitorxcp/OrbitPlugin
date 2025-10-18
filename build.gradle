@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+group = 'com.vitorxp'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url 'https://libraries.minecraft.net/' }
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
+    compileOnly 'com.mojang:authlib:1.5.21'
+    implementation("net.dv8tion:JDA:4.4.0_350")
+    implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
+    compileOnly name: 'ProtocolLib'
+    compileOnly name: 'JH_Economy'
+    compileOnly name: 'HolographicDisplays'
+    compileOnly name: 'Citizens'
+    compileOnly name: 'Vault'
+    compileOnly name: 'WorldGuard'
+    compileOnly name: 'WorldEdit'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+shadowJar {
+    relocate 'net.dv8tion.jda', 'com.vitorxp.synccordvx.libs.jda'
+    relocate 'org.sqlite', 'com.vitorxp.synccordvx.libs.sqlite'
+    relocate 'com.fasterxml.jackson', 'com.vitorxp.synccordvx.libs.jackson'
+    relocate 'okhttp3', 'com.vitorxp.synccordvx.libs.okhttp3'
+    relocate 'okio', 'com.vitorxp.synccordvx.libs.okio'
+    relocate 'com.sun.jna', 'com.vitorxp.synccordvx.libs.jna'
+    relocate 'com.neovisionaries.ws.client', 'com.vitorxp.synccordvx.libs.nvwebsocket'
+    relocate 'org.apache.commons.collections4', 'com.vitorxp.synccordvx.libs.collections4'
+    relocate 'club.minnced.opus', 'com.vitorxp.synccordvx.libs.opus'
+    relocate 'org.jetbrains.annotations', 'com.vitorxp.synccordvx.libs.annotations'
+    relocate 'com.iwebpp.crypto', 'com.vitorxp.SyncCordVX.libs.iwebpp'
+    relocate 'org.slf4j', 'com.vitorxp.SyncCordVX.libs.slf4j'
+    relocate 'gnu.trove', 'com.vitorxp.SyncCordVX.libs.trove'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.build.dependsOn(shadowJar)

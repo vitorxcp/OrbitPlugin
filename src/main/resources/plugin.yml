@@ -1,0 +1,148 @@
+name: SyncCordVX
+version: 1.0.0
+main: com.vitorxp.SyncCordVX.SyncCordVX
+api-version: 1.8
+depend: [ProtocolLib, Citizens, HolographicDisplays, JH_Economy, Vault, WorldGuard, WorldEdit]
+softdepend: []
+
+commands:
+  build:
+    description: Ativa/Desativa o modo de construção para a staff.
+    aliases: [ buildmode ]
+    permission: orbit.admin.buildmode
+  historico:
+    description: Ver histórico de punições de um jogador
+    usage: /historico <nick>
+  punir:
+    description: Abre GUI de punições para um jogador
+    usage: /punir <nick>
+  setslimepad:
+    description: Adiciona ou remove um jump pad de slime.
+    permission: orbit.slimepad.admin
+  reloadnpcs:
+    description: Reiniciar npcs.
+    usage: /reloadnpcs
+  setnpcrank:
+    description: Define a localização dos NPCs do ranking de dinheiro.
+    permission: orbit.setnpcrank
+  ban:
+    description: Bane um jogador
+    usage: /ban <nick> <tempo> [motivo]
+  kick:
+    description: Kicka um jogador
+    usage: /kick <nick> [motivo]
+  banip:
+    description: Bane o IP de um jogador
+    usage: /banip <nick> <tempo> [motivo]
+  mute:
+    description: Muta um jogador
+    usage: /mute <nick> <tempo> [motivo]
+  unban:
+    description: Desbane um jogador
+    usage: /unban <nick>
+  unbanip:
+    description: Desbane IP de um jogador
+    usage: /unbanip <nick>
+  unmute:
+    description: Desmuta um jogador
+    usage: /unmute <nick>
+  despunir:
+    description: Remove todas as punições ativas de um jogador
+    usage: /despunir <nick>
+  test:
+    description: Remove todas as punições ativas de um jogador
+    usage: /test
+  punicoes:
+    description: Ver todas as punições ativas
+    usage: /punicoes
+  vincular:
+    description: Vincula sua conta do Minecraft com o Discord.
+    aliases: [ linkar, vincularconta ]
+  manutencao:
+    description: Gerencia o modo de manutenção do servidor.
+    aliases: [ manutence ]
+    permission: synccord.manutencao.admin
+    usage: "/manutencao <on|off|whitelist add/remove [player]>"
+  desvincular:
+    description: Desvincula sua conta do Discord.
+    aliases: [ unlink ]
+  conta:
+    description: Mostra informações da sua conta vinculada.
+    aliases: [ account, perfil ]
+  setrankupnpc:
+    description: Define a localização dos NPCs do ranking de RankUp.
+    permission: orbit.setrankupnpc
+  reloadrankupnpc:
+    description: Força a atualização dos NPCs de RankUp.
+    permission: orbit.reload.rankupnpcs
+  aviso-restart:
+    description: Inicia um countdown com avisos para reiniciar o servidor.
+    aliases: [ avisoreiniciar, restart-warn ]
+    permission: orbit.restart.avisar
+  synccord:
+    description: Comando principal do SyncCordVX.
+    aliases: [ sync, sc ]
+    permission: orbit.synccord.admin
+  keepchunk:
+    description: Adiciona/Remove o chunk atual para ser mantido carregado.
+    permission: orbit.admin.keepchunk
+
+permissions:
+  orbit.admin.buildmode:
+    description: Permite usar o modo de construção e ter a proteção de build.
+    default: op
+  orbit.admin.keepchunk:
+    description: Permite gerenciar chunks que são mantidos carregados.
+    default: op
+  orbit.synccord.admin:
+    description: Permite usar o comando principal do SyncCordVX.
+    default: op
+  orbit.restart.avisar:
+    description: Permite usar o comando para agendar um reinício com avisos.
+    default: op
+  orbit.setrankupnpc:
+    description: Permite usar o comando para definir a localização dos NPCs de RankUp.
+    default: op
+  orbit.reload.rankupnpcs:
+    description: Permite forçar a atualização dos NPCs de RankUp.
+    default: op
+  synccordvx.*:
+    description: Acesso total ao SyncCordVX
+    children:
+      synccordvx.historico: true
+      synccordvx.punir: true
+      synccordvx.ban: true
+      synccordvx.kick: true
+      synccordvx.banip: true
+      synccordvx.mute: true
+      synccordvx.unban: true
+      synccordvx.unbanip: true
+      synccordvx.unmute: true
+      synccordvx.despunir: true
+      synccordvx.punicoes: true
+      synccordvx.vincular: true
+      synccordvx.staff: true
+      synccordvx.manutencao.admin: true
+      synccordvx.manutencao.bypass: true
+
+  synccordvx.staff:
+    description: Recebe notificações de staff
+    default: op
+  synccordvx.manutencao.admin:
+    description: Permite gerenciar o modo de manutenção.
+    default: op
+  synccordvx.manutencao.bypass:
+    description: Permite entrar no servidor durante a manutenção.
+    default: op
+  synccordvx.desvincular.outros:
+    description: Permite desvincular a conta de outros jogadores.
+    default: op
+  synccordvx.conta.outros:
+    description: Permite ver as informações da conta de outros jogadores.
+    default: op
+  orbit.setnpcrank:
+    description: Permite usar o comando para definir a localização dos NPCs de rank.
+    default: op
+  orbit.slimepad.admin:
+    description: Permite gerenciar os jump pads de slime.
+    default: op
