@@ -38,15 +38,12 @@ public class PunirCommand implements CommandExecutor {
 
         String targetName = args[0];
 
-        // Verifica se o jogador existe (online ou offline)
         Player target = Bukkit.getPlayer(targetName);
         if (target == null) {
-            // Poderia verificar no banco de dados se o jogador já jogou antes
             player.sendMessage("§cJogador não encontrado. Verifique se o nome está correto.");
             return true;
         }
 
-        // Abre a GUI de punição
         player.openInventory(PunirGUI.getInventory(targetName));
         player.sendMessage("§aAbrindo menu de punições para §f" + targetName);
 

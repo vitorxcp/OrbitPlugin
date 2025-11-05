@@ -24,12 +24,10 @@ public class VincularCommand implements CommandExecutor {
 
         Player player = (Player) sender;
 
-        // Verifica se o jogador já está vinculado
         plugin.getLinkDAO().isLinked(player.getUniqueId()).thenAccept(linked -> {
             if (linked) {
                 player.sendMessage("§cVocê já vinculou sua conta!");
             } else {
-                // Abre a GUI em um contexto síncrono
                 plugin.getServer().getScheduler().runTask(plugin, () -> {
                     player.openInventory(VincularGUI.getInventory(player));
                 });

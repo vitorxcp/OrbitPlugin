@@ -29,7 +29,7 @@ public class ReloadRankupNPCCommand implements CommandExecutor {
         }
 
         sender.sendMessage(ChatColor.YELLOW + "Forçando a atualização dos NPCs de ranking (RankUp)...");
-        npcManager.updateRankupNpcs();
+        npcManager.triggerUpdate();
         sender.sendMessage(ChatColor.GREEN + "Atualização iniciada com sucesso!");
 
         return true;

@@ -41,7 +41,7 @@ public class SetSlimePadCommand implements CommandExecutor {
         Location eyeLocation = player.getEyeLocation();
         Vector direction = player.getLocation().getDirection();
 
-        for (double i = 0.5; i < 5.0; i += 0.5) { // Ajuste fino no passo do raio
+        for (double i = 0.5; i < 5.0; i += 0.5) {
             Location currentLocation = eyeLocation.clone().add(direction.clone().multiply(i));
             Block currentBlock = currentLocation.getBlock();
             if (currentBlock.getType() != Material.AIR) {
@@ -62,14 +62,11 @@ public class SetSlimePadCommand implements CommandExecutor {
             return true;
         }
 
-        // --- CORREÇÃO PRINCIPAL AQUI ---
-        // Pega o gerenciador diretamente do plugin principal
         SlimePadManager manager = plugin.getSlimePadManager();
         if (manager == null) {
             player.sendMessage("§cErro: O SlimePadManager não foi carregado corretamente.");
             return true;
         }
-        // --- FIM DA CORREÇÃO ---
 
         if (args[0].equalsIgnoreCase("add")) {
             manager.addSlimePad(targetBlock.getLocation());

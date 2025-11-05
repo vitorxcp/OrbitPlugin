@@ -24,15 +24,11 @@ public class ChunkKeepAliveTask extends BukkitRunnable {
         for (Location loc : manager.getKeptChunks()) {
             World world = loc.getWorld();
             if (world != null) {
-                // Converte a localização para coordenadas de chunk
                 int chunkX = loc.getBlockX() >> 4;
                 int chunkZ = loc.getBlockZ() >> 4;
 
-                // Se o chunk não estiver carregado, força o carregamento
                 if (!world.isChunkLoaded(chunkX, chunkZ)) {
                     world.loadChunk(chunkX, chunkZ);
-                    // Opcional: Log para saber que o sistema está funcionando
-                    // plugin.getLogger().info("Chunk em (" + chunkX + ", " + chunkZ + ") foi recarregado à força.");
                 }
             }
         }

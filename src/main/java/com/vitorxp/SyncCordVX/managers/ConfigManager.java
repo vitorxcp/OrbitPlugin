@@ -46,7 +46,6 @@ public class ConfigManager {
         if (duration == -1) {
             return "Permanente";
         }
-        // Implementar formatação de tempo
         return "Temporário";
     }
 

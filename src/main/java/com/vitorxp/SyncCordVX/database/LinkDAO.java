@@ -37,7 +37,6 @@ public class LinkDAO {
 
     public CompletableFuture<Void> linkAccount(UUID minecraftUUID, String discordId) {
         return CompletableFuture.runAsync(() -> {
-            // REPLACE INTO funciona como um INSERT ou UPDATE.
             String query = "REPLACE INTO player_links (minecraft_uuid, discord_id) VALUES (?, ?);";
             try (Connection conn = databaseManager.getConnection();
                  PreparedStatement ps = conn.prepareStatement(query)) {

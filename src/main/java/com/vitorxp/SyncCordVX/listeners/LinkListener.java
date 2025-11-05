@@ -39,7 +39,7 @@ public class LinkListener implements Listener {
 
         if (event.getSlot() == 15) {
             player.closeInventory();
-            player.sendMessage("§9Entre em nosso Discord: §bhttps://discord.gg/DCjbGkcyMb"); // COLOQUE SEU LINK AQUI
+            player.sendMessage("§9Entre em nosso Discord: §bhttps://discord.gg/DCjbGkcyMb");
         }
     }
 
@@ -56,7 +56,6 @@ public class LinkListener implements Listener {
         event.setCancelled(true);
         String message = event.getMessage();
 
-        // Executa a lógica na thread principal do servidor
         plugin.getServer().getScheduler().runTask(plugin, () -> {
             if (stage == LinkManager.LinkStage.AWAITING_DISCORD_ID) {
                 linkManager.receivedDiscordId(player, message);

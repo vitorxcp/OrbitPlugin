@@ -27,7 +27,6 @@ public class MotivosGUI {
             inv.setItem(i, item);
         }
 
-        // Item para motivo customizado
         ItemStack customItem = new ItemBuilder(Material.BOOK_AND_QUILL)
                 .setName("§aMotivo Customizado")
                 .setLore("§7Clique para digitar um motivo", "§7personalizado")

@@ -57,7 +57,6 @@ public class MuteCommand implements CommandExecutor {
             return true;
         }
 
-        // Verifica se o jogador já está mutado
         if (plugin.getPunishmentManager().isMuted(target.getName(), target.getUniqueId())) {
             sender.sendMessage("§cEste jogador já está mutado.");
             return true;
@@ -77,13 +76,11 @@ public class MuteCommand implements CommandExecutor {
 
         plugin.getPunishmentManager().punish(punishment);
 
-        // Envia mensagem para o jogador mutado
         String muteMessage = plugin.getConfigManager().getMuteMessage(punishment);
         target.sendMessage(muteMessage);
 
         sender.sendMessage("§aJogador " + target.getName() + " mutado com sucesso por " + TimeUtil.formatTime(duration) + ".");
 
-        // Broadcast para staffs
         Bukkit.broadcast("§c[STAFF] §f" + target.getName() + " foi mutado por " + sender.getName() + " por " + reason, "synccordvx.staff");
 
         return true;

@@ -65,7 +65,6 @@ public class ContaCommand implements CommandExecutor {
                 });
 
             }, error -> {
-                // Se não encontrou o usuário (conta deletada, etc)
                 plugin.getServer().getScheduler().runTask(plugin, () -> {
                     sender.sendMessage("§cNão foi possível encontrar o usuário do Discord com o ID vinculado: " + discordId);
                     sender.sendMessage("§cO jogador pode ter deletado a conta do Discord.");

@@ -13,9 +13,8 @@ public class RankupNPCUpdater extends BukkitRunnable {
 
     @Override
     public void run() {
-        // Verifica se o manager existe antes de chamar
         if (plugin.getRankupNpcManager() != null) {
-            plugin.getRankupNpcManager().updateRankupNpcs();
+            plugin.getRankupNpcManager().triggerUpdate();
         }
     }
 }

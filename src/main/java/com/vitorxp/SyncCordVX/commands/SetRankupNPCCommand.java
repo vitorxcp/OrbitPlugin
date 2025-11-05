@@ -41,7 +41,6 @@ public class SetRankupNPCCommand implements CommandExecutor {
             return true;
         }
 
-        // Verifica se o manager existe antes de chamar
         if (plugin.getRankupNpcManager() != null) {
             plugin.getRankupNpcManager().setNpcLocation(rank, player.getLocation());
             sender.sendMessage("§aNPC do Top Rank " + rank + " definido na sua localização atual!");

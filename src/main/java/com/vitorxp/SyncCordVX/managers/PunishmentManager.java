@@ -43,7 +43,6 @@ public class PunishmentManager {
                 player.kickPlayer(banMessage);
                 break;
             case MUTE:
-                // O mute é verificado no evento de chat
                 break;
             case KICK:
                 String kickMessage = plugin.getConfigManager().getKickMessage(punishment);
@@ -57,13 +56,11 @@ public class PunishmentManager {
         plugin.getBotManager().sendPunishmentRemoveEmbed(punishment);
     }
 
-    // MÉTODO MODIFICADO
     public List<Punishment> getActivePunishments(String playerName, UUID playerUUID) {
         List<Punishment> punishmentsFromDB = punishmentDAO.getActivePunishmentsByPlayer(playerName, playerUUID);
         return filterAndDeactivateExpired(punishmentsFromDB);
     }
 
-    // MÉTODO MODIFICADO
     public List<Punishment> getActivePunishmentsByIP(String ip) {
         List<Punishment> punishmentsFromDB = punishmentDAO.getActivePunishmentsByIP(ip);
         return filterAndDeactivateExpired(punishmentsFromDB);
@@ -73,15 +70,12 @@ public class PunishmentManager {
         return punishmentDAO.getPunishmentHistory(playerName, playerUUID);
     }
 
-    // MÉTODO MODIFICADO
     public List<Punishment> getAllActivePunishments() {
         List<Punishment> punishmentsFromDB = punishmentDAO.getAllActivePunishments();
         return filterAndDeactivateExpired(punishmentsFromDB);
     }
 
-    // NOVO MÉTODO AJUDANTE PARA LIMPAR PUNIÇÕES EXPIRADAS
     private List<Punishment> filterAndDeactivateExpired(List<Punishment> punishments) {
-        // Separa as punições em duas listas: as expiradas e as que ainda estão ativas
         List<Punishment> expired = new ArrayList<>();
         List<Punishment> stillActive = new ArrayList<>();
 
@@ -93,8 +87,6 @@ public class PunishmentManager {
             }
         }
 
-        // Se encontramos punições expiradas, mandamos desativá-las no banco de dados
-        // Fazemos isso de forma assíncrona para não travar o servidor
         if (!expired.isEmpty()) {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 for (Punishment p : expired) {
@@ -103,13 +95,11 @@ public class PunishmentManager {
             });
         }
 
-        // Retorna apenas a lista das punições que realmente estão ativas
         return stillActive;
     }
 
 
     public boolean isBanned(String playerName, UUID playerUUID) {
-        // A lógica de verificação já vai usar a lista filtrada, então não precisa mudar aqui
         for (Punishment p : getActivePunishments(playerName, playerUUID)) {
             if (p.getType() == Punishment.Type.BAN) {
                 return true;

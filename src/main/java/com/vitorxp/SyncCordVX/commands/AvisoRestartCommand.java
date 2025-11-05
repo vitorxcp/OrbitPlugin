@@ -12,7 +12,7 @@ import org.bukkit.scheduler.BukkitTask;
 public class AvisoRestartCommand implements CommandExecutor {
 
     private final SyncCordVX plugin;
-    public static BukkitTask currentTask = null; // Guarda a tarefa de reinício atual
+    public static BukkitTask currentTask = null;
 
     public AvisoRestartCommand(SyncCordVX plugin) {
         this.plugin = plugin;
@@ -30,7 +30,6 @@ public class AvisoRestartCommand implements CommandExecutor {
             return true;
         }
 
-        // Comando para cancelar um reinício agendado
         if (args[0].equalsIgnoreCase("cancelar")) {
             if (currentTask == null) {
                 sender.sendMessage(ChatColor.RED + "Nenhum reinício está agendado para ser cancelado.");
@@ -43,7 +42,6 @@ public class AvisoRestartCommand implements CommandExecutor {
             return true;
         }
 
-        // Se já houver um reinício agendado
         if (currentTask != null) {
             sender.sendMessage(ChatColor.RED + "Um reinício já está em andamento. Use /aviso-restart cancelar primeiro.");
             return true;
@@ -68,9 +66,6 @@ public class AvisoRestartCommand implements CommandExecutor {
         return true;
     }
 
-    /**
-     * Converte uma string de tempo (ex: "5m") para segundos.
-     */
     private int parseTime(String timeString) {
         timeString = timeString.toLowerCase();
         int value = Integer.parseInt(timeString.replaceAll("[^0-9]", ""));

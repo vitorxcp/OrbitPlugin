@@ -83,19 +83,16 @@ public class BotManager {
 
             EmbedBuilder embed = new EmbedBuilder();
 
-            // Título
             String title = embedConfig.getString("title", "Punição Aplicada");
             if (title != null && !title.isEmpty()) {
                 embed.setTitle(replacePlaceholders(title, punishment));
             }
 
-            // Descrição
             String description = embedConfig.getString("description", "");
             if (description != null && !description.isEmpty()) {
                 embed.setDescription(replacePlaceholders(description, punishment));
             }
 
-            // Cor
             String colorHex = embedConfig.getString("color", "#FF0000");
             try {
                 embed.setColor(Color.decode(colorHex));
@@ -103,7 +100,6 @@ public class BotManager {
                 embed.setColor(Color.RED);
             }
 
-            // Thumbnail
             if (embedConfig.contains("thumbnail")) {
                 String thumbnail = embedConfig.getString("thumbnail");
                 if (thumbnail != null && !thumbnail.isEmpty()) {
@@ -111,7 +107,6 @@ public class BotManager {
                 }
             }
 
-            // Footer
             if (embedConfig.contains("footer")) {
                 String footer = embedConfig.getString("footer");
                 if (footer != null && !footer.isEmpty()) {
@@ -119,7 +114,6 @@ public class BotManager {
                 }
             }
 
-            // Campos adicionais
             if (embedConfig.contains("fields")) {
                 ConfigurationSection fieldsSection = embedConfig.getConfigurationSection("fields");
                 if (fieldsSection != null) {
@@ -138,12 +132,10 @@ public class BotManager {
                 }
             }
 
-            // Timestamp
             if (embedConfig.getBoolean("timestamp", true)) {
                 embed.setTimestamp(Instant.now());
             }
 
-            // Envia a embed
             channel.sendMessage(embed.build()).queue(
                     success -> plugin.getLogger().info("Embed de punição enviada para o Discord com sucesso!"),
                     error -> plugin.getLogger().warning("Erro ao enviar embed para Discord: " + error.getMessage())
@@ -181,19 +173,16 @@ public class BotManager {
 
             EmbedBuilder embed = new EmbedBuilder();
 
-            // Título
             String title = embedConfig.getString("title", "Punição Removida");
             if (title != null && !title.isEmpty()) {
                 embed.setTitle(replacePlaceholders(title, punishment));
             }
 
-            // Descrição
             String description = embedConfig.getString("description", "");
             if (description != null && !description.isEmpty()) {
                 embed.setDescription(replacePlaceholders(description, punishment));
             }
 
-            // Cor
             String colorHex = embedConfig.getString("color", "#39B906");
             try {
                 embed.setColor(Color.decode(colorHex));
@@ -201,7 +190,6 @@ public class BotManager {
                 embed.setColor(Color.RED);
             }
 
-            // Thumbnail
             if (embedConfig.contains("thumbnail")) {
                 String thumbnail = embedConfig.getString("thumbnail");
                 if (thumbnail != null && !thumbnail.isEmpty()) {
@@ -209,7 +197,6 @@ public class BotManager {
                 }
             }
 
-            // Footer
             if (embedConfig.contains("footer")) {
                 String footer = embedConfig.getString("footer");
                 if (footer != null && !footer.isEmpty()) {
@@ -217,7 +204,6 @@ public class BotManager {
                 }
             }
 
-            // Campos adicionais
             if (embedConfig.contains("fields")) {
                 ConfigurationSection fieldsSection = embedConfig.getConfigurationSection("fields");
                 if (fieldsSection != null) {
@@ -236,12 +222,10 @@ public class BotManager {
                 }
             }
 
-            // Timestamp
             if (embedConfig.getBoolean("timestamp", true)) {
                 embed.setTimestamp(Instant.now());
             }
 
-            // Envia a embed
             channel.sendMessage(embed.build()).queue(
                     success -> plugin.getLogger().info("Embed de punição enviada para o Discord com sucesso!"),
                     error -> plugin.getLogger().warning("Erro ao enviar embed para Discord: " + error.getMessage())
@@ -259,18 +243,14 @@ public class BotManager {
         }
 
         try {
-            // Tenta encontrar o usuário pelo ID
             jda.retrieveUserById(userId).queue(user -> {
-                // Se encontrou, tenta abrir um canal privado (DM)
                 user.openPrivateChannel().queue(privateChannel -> {
-                    // Se conseguiu abrir a DM, envia a mensagem com o código
                     String message = "Olá! Seu código para vincular sua conta no servidor de Minecraft é: **" + code + "**\n" +
                             "Este código expira em 5 minutos.";
 
                     privateChannel.sendMessage(message).queue(
-                            success -> callback.accept(true), // Mensagem enviada com sucesso
+                            success -> callback.accept(true),
                             error -> {
-                                // Erro comum: o bot não pode enviar DMs para o usuário
                                 if (error instanceof ErrorResponseException && ((ErrorResponseException) error).getErrorCode() == 50007) {
                                     plugin.getLogger().warning("Não foi possível enviar DM para " + user.getAsTag() + ". DMs bloqueadas.");
                                 } else {

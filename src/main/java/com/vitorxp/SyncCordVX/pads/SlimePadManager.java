@@ -26,7 +26,6 @@ public class SlimePadManager {
 
 
     public void addSlimePad(Location location) {
-        // Normaliza a localização para ignorar a direção que o jogador olha
         Location blockLocation = location.getBlock().getLocation();
         if (slimePads.add(blockLocation)) {
             savePads();
@@ -44,8 +43,8 @@ public class SlimePadManager {
         return slimePads.contains(location.getBlock().getLocation());
     }
 
-    public void loadPads() { // <-- Mude de private para public
-        slimePads.clear(); // Limpa a lista antiga antes de carregar a nova
+    public void loadPads() {
+        slimePads.clear();
         List<?> locationList = padsConfig.getList("pads");
         if (locationList == null) return;
 

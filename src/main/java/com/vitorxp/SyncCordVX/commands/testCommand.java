@@ -34,10 +34,8 @@ public class testCommand implements CommandExecutor {
         Player player = (Player) sender;
         player.sendMessage("§eCalculando o Top 3 jogadores mais ricos do servidor...");
 
-        // Executa a leitura do arquivo fora da thread principal para garantir performance
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 
-            // Constrói o caminho para o arquivo de contas do JH_Economy
             File dataFile = new File(plugin.getDataFolder().getParentFile(), "JH_Economy/contas.save");
 
             if (!dataFile.exists()) {
@@ -47,23 +45,19 @@ public class testCommand implements CommandExecutor {
 
             HashMap<String, Double> allBalances = new HashMap<>();
 
-            // Usa try-with-resources para garantir que o leitor de arquivo seja fechado
             try (BufferedReader reader = new BufferedReader(new FileReader(dataFile))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     try {
-                        // O formato é: nome:saldo;NomeOriginal
                         String[] parts = line.split(":");
-                        if (parts.length < 2) continue; // Pula linhas mal formatadas
+                        if (parts.length < 2) continue;
 
                         String playerName = parts[0];
-                        // Pega a parte do saldo, mesmo que tenha o nome original depois do ';'
                         String balancePart = parts[1].split(";")[0];
                         double balance = Double.parseDouble(balancePart);
 
                         allBalances.put(playerName, balance);
                     } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                        // Ignora linhas que não consiga interpretar para não quebrar o comando
                         plugin.getLogger().warning("Não foi possível ler a linha do baltop: " + line);
                     }
                 }
@@ -73,14 +67,12 @@ public class testCommand implements CommandExecutor {
                 return;
             }
 
-            // A partir daqui, a lógica de ordenar e exibir é a mesma de antes
             List<Map.Entry<String, Double>> top3 = allBalances.entrySet()
                     .stream()
                     .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
                     .limit(3)
                     .collect(Collectors.toList());
 
-            // Volta para a thread principal para enviar a mensagem ao jogador (obrigatório)
             Bukkit.getScheduler().runTask(plugin, () -> {
                 player.sendMessage("§6§l========== §eTOP 3 - MAIS RICOS §6§l==========");
                 if (top3.isEmpty()) {
@@ -88,7 +80,6 @@ public class testCommand implements CommandExecutor {
                 } else {
                     int rank = 1;
                     for (Map.Entry<String, Double> entry : top3) {
-                        // O nome já está em minúsculas, vamos capitalizar para ficar mais bonito
                         String playerName = capitalize(entry.getKey());
                         double balance = entry.getValue();
                         String formattedBalance = String.format("%,.2f", balance);

@@ -41,14 +41,12 @@ public class HistoricoCommand implements CommandExecutor {
 
         String targetName = args[0];
 
-        // Busca o UUID do jogador (online ou offline)
         UUID targetUUID = getPlayerUUID(targetName);
         if (targetUUID == null) {
             player.sendMessage("§cJogador não encontrado.");
             return true;
         }
 
-        // Abre a GUI do histórico
         player.openInventory(HistoricoGUI.getInventory(plugin, targetName));
         player.sendMessage("§aCarregando histórico de punições de §f" + targetName);
 
@@ -56,13 +54,11 @@ public class HistoricoCommand implements CommandExecutor {
     }
 
     private UUID getPlayerUUID(String playerName) {
-        // Primeiro tenta encontrar online
         Player onlinePlayer = Bukkit.getPlayer(playerName);
         if (onlinePlayer != null) {
             return onlinePlayer.getUniqueId();
         }
 
-        // Depois tenta encontrar nos jogadores offline
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
         if (offlinePlayer.hasPlayedBefore()) {
             return offlinePlayer.getUniqueId();

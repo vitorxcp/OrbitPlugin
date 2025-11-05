@@ -17,7 +17,7 @@ import com.vitorxp.SyncCordVX.npcs.rankup.RankupNPCUpdater;
 import com.vitorxp.SyncCordVX.pads.SlimePadManager;
 import com.vitorxp.SyncCordVX.pads.SlimePadParticleTask;
 import com.vitorxp.SyncCordVX.tasks.ChunkKeepAliveTask;
-import com.vitorxp.SyncCordVX.tasks.LinkReminderTask;
+import com.vitorxp.SyncCordVX.tasks.TPSWatcher;
 import com.vitorxp.SyncCordVX.utils.TPSMonitor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
@@ -81,8 +81,10 @@ public class SyncCordVX extends JavaPlugin {
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
-
         logStartupMessage();
+
+        LogManager.init(this);
+        new TPSWatcher(this).runTaskTimer(this, 100L, 100L);
 
         configManager = new ConfigManager(this);
         databaseManager = new DatabaseManager(this);
@@ -105,7 +107,6 @@ public class SyncCordVX extends JavaPlugin {
         this.startupTime = System.currentTimeMillis();
 
         TPSMonitor.getInstance().runTaskTimer(this, 100L, 20L);
-        //new LinkReminderTask(this).runTaskTimer(this, 1200L, 6000L);
         new ChunkKeepAliveTask(this).runTaskTimer(this, 100L, 200L);
 
         new BukkitRunnable() {

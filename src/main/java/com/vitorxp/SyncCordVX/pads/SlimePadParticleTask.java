@@ -21,14 +21,11 @@ public class SlimePadParticleTask extends BukkitRunnable {
             return;
         }
 
-        // Para cada slime pad registrado...
         for (Location padLocation : manager.getSlimePads()) {
             World world = padLocation.getWorld();
             if (world != null) {
-                // Posição central e um pouco acima do bloco
                 Location particleLocation = padLocation.clone().add(0.5, 1.1, 0.5);
 
-                // Gera a partícula. Effect.HAPPY_VILLAGER são as estrelinhas verdes.
                 world.playEffect(particleLocation, Effect.HAPPY_VILLAGER, 1);
             }
         }

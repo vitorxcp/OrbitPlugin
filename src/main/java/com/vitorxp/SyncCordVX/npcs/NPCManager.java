@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ public class NPCManager {
     private final Map<Integer, Hologram> rankedHolograms = new HashMap<>();
     private FileConfiguration locationsConfig;
     private File locationsFile;
+    private static final String NPC_METADATA_KEY = "SyncCordVX_EconomyNPC";
 
     public NPCManager(SyncCordVX plugin) {
         this.plugin = plugin;
@@ -37,35 +39,30 @@ public class NPCManager {
     }
 
     public void setNpcLocation(int rank, Location location) {
-        // Se já existe um NPC para este rank, removemos o antigo primeiro para evitar duplicatas
         if (rankedNpcs.containsKey(rank)) {
-            rankedNpcs.get(rank).destroy();
+            NPC oldNpc = rankedNpcs.remove(rank);
+            if (oldNpc != null) oldNpc.destroy();
         }
         if (rankedHolograms.containsKey(rank)) {
-            rankedHolograms.get(rank).delete();
+            Hologram oldHologram = rankedHolograms.remove(rank);
+            if (oldHologram != null && !oldHologram.isDeleted()) oldHologram.delete();
         }
 
-        // Cria um novo NPC
         NPCRegistry registry = CitizensAPI.getNPCRegistry();
-        NPC npc = registry.createNPC(EntityType.PLAYER, "§e#" + rank + " - Carregando...");
+        NPC npc = registry.createNPC(EntityType.PLAYER, rank + " - Carregando...");
         npc.spawn(location);
         npc.setProtected(true);
+        npc.data().set(NPC_METADATA_KEY, true);
 
-        // Salva a localização E o ID do novo NPC no arquivo de configuração
         String path = "npcs.top" + rank;
         locationsConfig.set(path + ".location", location);
         locationsConfig.set(path + ".id", npc.getId());
         saveLocations();
 
-        // Armazena o novo NPC e cria seu holograma
         rankedNpcs.put(rank, npc);
-
         Location hologramLocation = location.clone().add(0, 2.3, 0);
         Hologram hologram = HologramsAPI.createHologram(plugin, hologramLocation);
-        hologram.appendTextLine("§e§lTOP #" + rank);
         rankedHolograms.put(rank, hologram);
-
-        // Dispara uma atualização imediata para o NPC recém-criado
         updateRankedNpcs();
     }
 
@@ -98,7 +95,7 @@ public class NPCManager {
             for (int i = 1; i <= 3; i++) {
                 NPC npc = rankedNpcs.get(i);
                 Hologram hologram = rankedHolograms.get(i);
-                if (npc == null || hologram == null) continue;
+                if (npc == null || hologram == null || !npc.isSpawned() || hologram.isDeleted()) continue;
 
                 if (top3.size() >= i) {
                     Map.Entry<String, Double> entry = top3.get(i - 1);
@@ -110,7 +107,7 @@ public class NPCManager {
                     updateNpcSkin(npc, playerName);
 
                     hologram.clearLines();
-                    hologram.appendTextLine("§6§lTOP #" + i);
+                    hologram.appendTextLine("§6§lTOP #" + i + " MONEY");
                     hologram.appendTextLine("§f" + playerName);
                     hologram.appendTextLine("§a$" + formattedBalance);
                 } else {
@@ -118,7 +115,7 @@ public class NPCManager {
                     updateNpcSkin(npc, "Steve");
 
                     hologram.clearLines();
-                    hologram.appendTextLine("§6§lTOP #" + i);
+                    hologram.appendTextLine("§6§lTOP #" + i + " MONEY");
                     hologram.appendTextLine("§7- Vazio -");
                 }
             }
@@ -130,9 +127,7 @@ public class NPCManager {
         if (currentSkin != null && currentSkin.equalsIgnoreCase(skinName)) {
             return;
         }
-
         npc.data().set("player-skin-name", skinName);
-
         if (npc.isSpawned()) {
             Location loc = npc.getStoredLocation();
             npc.despawn();
@@ -141,82 +136,76 @@ public class NPCManager {
     }
 
     public void shutdown() {
-        // NÃO destrua os NPCs. Apenas limpe as referências e os hologramas.
-        // O Citizens cuidará de salvar e recarregar os NPCs fisicamente.
         if (!rankedHolograms.isEmpty()) {
-            rankedHolograms.values().forEach(Hologram::delete);
+            rankedHolograms.values().forEach(h -> {
+                if (h != null && !h.isDeleted()) h.delete();
+            });
         }
         rankedNpcs.clear();
         rankedHolograms.clear();
-        plugin.getLogger().info("Hologramas dos NPCs de rank removidos. Os NPCs serão salvos pelo Citizens.");
     }
 
     private void loadNpcs() {
         NPCRegistry registry = CitizensAPI.getNPCRegistry();
+
+        List<NPC> toDestroy = new ArrayList<>();
+        for (NPC npc : registry) {
+            if (npc.data().has(NPC_METADATA_KEY)) {
+                toDestroy.add(npc);
+            }
+        }
+        for (NPC npc : toDestroy) {
+            npc.destroy();
+        }
+
+        new ArrayList<>(HologramsAPI.getHolograms(plugin)).forEach(Hologram::delete);
+
+        rankedNpcs.clear();
+        rankedHolograms.clear();
+
         ConfigurationSection npcSection = locationsConfig.getConfigurationSection("npcs");
         if (npcSection == null) return;
 
-        for (String key : npcSection.getKeys(false)) { // ex: "top1", "top2"
+        for (String key : npcSection.getKeys(false)) {
             try {
                 int rank = Integer.parseInt(key.replace("top", ""));
-                int npcId = npcSection.getInt(key + ".id", -1);
                 Location loc = (Location) npcSection.get(key + ".location");
+                if (loc == null) continue;
 
-                if (loc == null) {
-                    plugin.getLogger().warning("Localização para o NPC " + key + " não encontrada. Pulando.");
-                    continue;
-                }
+                NPC npc = registry.createNPC(EntityType.PLAYER, rank + " - Carregando...");
+                npc.spawn(loc);
+                npc.setProtected(true);
+                npc.data().set(NPC_METADATA_KEY, true);
 
-                NPC npc = (npcId != -1) ? registry.getById(npcId) : null;
-
-                if (npc == null) {
-                    // Se o NPC não foi encontrado (deletado/corrompido), recria ele no local salvo.
-                    plugin.getLogger().warning("NPC do Top " + rank + " (ID: " + npcId + ") não encontrado. Recriando...");
-
-                    npc = registry.createNPC(EntityType.PLAYER, "§e#" + rank + " - Recriando...");
-                    npc.spawn(loc);
-                    npc.setProtected(true);
-
-                    // Atualiza o arquivo de config com o NOVO ID do NPC recriado.
-                    npcSection.set(key + ".id", npc.getId());
-                    saveLocations();
-                }
-
-                // Garante que o NPC esteja spawnado no local correto.
-                if (!npc.isSpawned() || !npc.getStoredLocation().getWorld().equals(loc.getWorld()) || npc.getStoredLocation().distanceSquared(loc) > 1) {
-                    npc.teleport(loc, null);
-                    if(!npc.isSpawned()) npc.spawn(loc);
-                }
-
-                // Adiciona o NPC (encontrado ou recriado) ao controle do plugin.
+                npcSection.set(key + ".id", npc.getId());
                 rankedNpcs.put(rank, npc);
 
-                // Remove hologramas antigos que possam ter ficado órfãos no mesmo local.
-                HologramsAPI.getHolograms(plugin).stream()
-                        .filter(h -> h.getLocation().getWorld().equals(loc.getWorld()) && h.getLocation().distanceSquared(loc.clone().add(0, 2.3, 0)) < 0.1)
-                        .forEach(Hologram::delete);
-
-                // Recria o holograma para ele.
                 Location hologramLocation = loc.clone().add(0, 2.3, 0);
                 Hologram hologram = HologramsAPI.createHologram(plugin, hologramLocation);
                 rankedHolograms.put(rank, hologram);
 
             } catch (Exception e) {
-                plugin.getLogger().severe("Falha ao carregar o NPC de rank: " + key);
+                plugin.getLogger().severe("Falha ao carregar o NPC de economia: " + key);
                 e.printStackTrace();
             }
         }
+        saveLocations();
 
         if (!rankedNpcs.isEmpty()) {
-            plugin.getLogger().info(rankedNpcs.size() + " NPCs de rank carregados.");
-            Bukkit.getScheduler().runTaskLater(plugin, this::updateRankedNpcs, 40L); // Delay de 2s para skins e nomes.
+            plugin.getLogger().info(rankedNpcs.size() + " NPCs de Top Money carregados.");
+            Bukkit.getScheduler().runTaskLater(plugin, this::updateRankedNpcs, 40L);
         }
     }
 
     private void setupLocationsFile() {
         locationsFile = new File(plugin.getDataFolder(), "npclocations.yml");
         if (!locationsFile.exists()) {
-            plugin.saveResource("npclocations.yml", false);
+            try {
+                locationsFile.createNewFile();
+            } catch (IOException e) {
+                plugin.getLogger().severe("Não foi possível criar o arquivo npclocations.yml!");
+                e.printStackTrace();
+            }
         }
         locationsConfig = YamlConfiguration.loadConfiguration(locationsFile);
     }
