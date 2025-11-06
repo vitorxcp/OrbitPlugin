@@ -3,6 +3,10 @@ discord:
   enabled: false
   token: "SEU_TOKEN_DO_BOT_AQUI"
   channel: "ID_DO_CANAL_DE_PUNICOES"
+  activities:
+    - "Jogando com %players%/%max_players% players."
+    - "TPS atual: %tps%"
+    - "Ping médio: %ping%ms"
   embeds:
     addpunishments:
       title: "Punição Aplicada"

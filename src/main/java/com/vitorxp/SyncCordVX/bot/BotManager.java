@@ -45,7 +45,7 @@ public class BotManager {
 
             jda.awaitReady();
             plugin.getLogger().info("Bot do Discord conectado com sucesso!");
-
+            startActivityRotation();
         } catch (LoginException | InterruptedException | IllegalArgumentException e) {
             plugin.getLogger().severe("Erro ao conectar bot do Discord: " + e.getMessage());
             enabled = false;
@@ -53,6 +53,107 @@ public class BotManager {
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
             }
+        }
+    }
+
+    private void startActivityRotation() {
+        java.util.List<String> activities = plugin.getConfig().getStringList("discord.activities");
+        if (activities == null || activities.isEmpty()) {
+            plugin.getLogger().warning("Nenhuma activity configurada em 'discord.activities' no config.yml.");
+            return;
+        }
+
+        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+            if (jda == null) return;
+
+            int index = (int) ((System.currentTimeMillis() / 15000L) % activities.size());
+            String raw = activities.get(index);
+            String type = "playing";
+
+            if (raw.contains(":")) {
+                String[] split = raw.split(":", 2);
+                type = split[0].trim().toLowerCase();
+                raw = split[1].trim();
+            }
+
+            String formatted = replaceServerPlaceholders(raw);
+
+            try {
+                switch (type) {
+                    case "watching":
+                        jda.getPresence().setActivity(net.dv8tion.jda.api.entities.Activity.watching(formatted));
+                        break;
+                    case "listening":
+                        jda.getPresence().setActivity(net.dv8tion.jda.api.entities.Activity.listening(formatted));
+                        break;
+                    case "competing":
+                        jda.getPresence().setActivity(net.dv8tion.jda.api.entities.Activity.competing(formatted));
+                        break;
+                    default:
+                        jda.getPresence().setActivity(net.dv8tion.jda.api.entities.Activity.playing(raw));
+                        break;
+                }
+            } catch (Exception e) {
+                plugin.getLogger().warning("Erro ao atualizar activity do bot: " + e.getMessage());
+            }
+
+        }, 20L, 20L * 15);
+    }
+
+    private String replaceServerPlaceholders(String text) {
+        if (text == null) return "";
+
+        int players = plugin.getServer().getOnlinePlayers().size();
+        int maxPlayers = plugin.getServer().getMaxPlayers();
+
+        double tps = getServerTPS();
+        long ping = getAveragePing();
+
+        return text
+                .replace("%players%", String.valueOf(players))
+                .replace("%max_players%", String.valueOf(maxPlayers))
+                .replace("%tps%", String.format("%.1f", tps))
+                .replace("%ping%", String.valueOf(ping));
+    }
+
+    private double getServerTPS() {
+        try {
+            Object minecraftServer = getMinecraftServer();
+            if (minecraftServer == null) return 20.0;
+
+            java.lang.reflect.Field recentTpsField = minecraftServer.getClass().getField("recentTps");
+            double[] tpsValues = (double[]) recentTpsField.get(minecraftServer);
+            return Math.min(20.0, tpsValues[0]);
+        } catch (Exception e) {
+            return 20.0;
+        }
+    }
+
+    private Object getMinecraftServer() {
+        try {
+            Object craftServer = plugin.getServer();
+            java.lang.reflect.Method getServerMethod = craftServer.getClass().getMethod("getServer");
+            return getServerMethod.invoke(craftServer);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private long getAveragePing() {
+        try {
+            long total = 0;
+            int count = 0;
+
+            for (org.bukkit.entity.Player player : plugin.getServer().getOnlinePlayers()) {
+                Object handle = player.getClass().getMethod("getHandle").invoke(player);
+                java.lang.reflect.Field pingField = handle.getClass().getField("ping");
+                total += pingField.getInt(handle);
+                count++;
+            }
+
+            return count == 0 ? 0 : total / count;
+        } catch (Exception e) {
+            return 0;
         }
     }
 

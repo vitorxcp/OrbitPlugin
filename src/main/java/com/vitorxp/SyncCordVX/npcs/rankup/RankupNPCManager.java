@@ -80,8 +80,11 @@ public class RankupNPCManager {
         saveLocations();
 
         rankedNpcs.put(rank, npc);
-        Location holoLoc = location.clone().add(0, 2.3, 0);
-        Hologram hologram = HologramsAPI.createHologram(plugin, holoLoc);
+
+        // altura corrigida (mesmo padrão do NPCManager)
+        Location hologramLocation = location.clone().add(0, 2.3, 0);
+        Hologram hologram = HologramsAPI.createHologram(plugin, hologramLocation);
+        hologram.appendTextLine("§7Carregando...");
         rankedHolograms.put(rank, hologram);
 
         triggerUpdate();
@@ -137,48 +140,43 @@ public class RankupNPCManager {
     }
 
     private void updateVisualTop(List<Map.Entry<String, Integer>> top3) {
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            for (int i = 1; i <= 3; i++) {
-                NPC npc = rankedNpcs.get(i);
-                Hologram hologram = rankedHolograms.get(i);
+        for (int i = 1; i <= 3; i++) {
+            NPC npc = rankedNpcs.get(i);
+            Hologram hologram = rankedHolograms.get(i);
 
-                if (npc == null || hologram == null) continue;
-                if (hologram.isDeleted()) {
-                    Location loc = npc.getStoredLocation().clone().add(0, 2.3, 0);
-                    hologram = HologramsAPI.createHologram(plugin, loc);
-                    rankedHolograms.put(i, hologram);
-                }
+            if (npc == null || hologram == null) continue;
 
-                try {
-                    hologram.clearLines();
-                } catch (Exception e) {
-                    plugin.getLogger().warning("Falha ao limpar holograma do TOP " + i + ": " + e.getMessage());
-                    continue;
-                }
+            try {
+                hologram.clearLines();
+            } catch (Exception ignored) {}
 
-                if (top3.size() >= i) {
-                    Map.Entry<String, Integer> entry = top3.get(i - 1);
-                    String name = capitalize(entry.getKey());
-                    int rankValue = entry.getValue();
+            if (top3.size() >= i) {
+                Map.Entry<String, Integer> entry = top3.get(i - 1);
+                String name = capitalize(entry.getKey());
+                int rankValue = entry.getValue();
+                String rankName = plugin.getConfig().getString("rankup-npcs.rank-names." + rankValue, "Rank " + rankValue);
 
-                    String rankName = plugin.getConfig().getString("rankup-npcs.rank-names." + rankValue, "Rank " + rankValue);
-                    npc.setName(name);
-                    updateNpcSkin(npc, name);
+                npc.setName(name);
+                updateNpcSkin(npc, name);
 
-                    hologram.appendTextLine("§6§lTOP #" + i + " RANK");
-                    hologram.appendTextLine("§f" + name);
-                    hologram.appendTextLine("§b" + rankName);
-                } else {
-                    npc.setName("§7#" + i + " - Vazio");
-                    updateNpcSkin(npc, "Steve");
-                    hologram.appendTextLine("§6§lTOP #" + i + " RANK");
-                    hologram.appendTextLine("§7- Vazio -");
-                }
+                Location holoLoc = npc.getStoredLocation().clone().add(0, 3.3, 0);
+                if (!hologram.isDeleted()) hologram.delete();
+                hologram = HologramsAPI.createHologram(plugin, holoLoc);
+                rankedHolograms.put(i, hologram);
+
+                hologram.appendTextLine("§6§lTOP #" + i + " RANK");
+                hologram.appendTextLine("§f" + name);
+                hologram.appendTextLine("§b" + rankName);
+            } else {
+                npc.setName("§7#" + i + " - Vazio");
+                updateNpcSkin(npc, "Steve");
+
+                hologram.appendTextLine("§6§lTOP #" + i + " RANK");
+                hologram.appendTextLine("§7- Vazio -");
             }
-            finishUpdate();
-        });
+        }
+        finishUpdate();
     }
-
 
     private void finishUpdate() {
         isUpdating = false;
