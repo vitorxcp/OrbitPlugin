@@ -141,6 +141,7 @@ public class NPCManager {
                 if (h != null && !h.isDeleted()) h.delete();
             });
         }
+
         rankedNpcs.clear();
         rankedHolograms.clear();
     }
@@ -148,18 +149,7 @@ public class NPCManager {
     private void loadNpcs() {
         NPCRegistry registry = CitizensAPI.getNPCRegistry();
 
-        List<NPC> toDestroy = new ArrayList<>();
-        for (NPC npc : registry) {
-            if (npc.data().has(NPC_METADATA_KEY)) {
-                toDestroy.add(npc);
-            }
-        }
-        for (NPC npc : toDestroy) {
-            npc.destroy();
-        }
-
         new ArrayList<>(HologramsAPI.getHolograms(plugin)).forEach(Hologram::delete);
-
         rankedNpcs.clear();
         rankedHolograms.clear();
 
@@ -172,12 +162,20 @@ public class NPCManager {
                 Location loc = (Location) npcSection.get(key + ".location");
                 if (loc == null) continue;
 
-                NPC npc = registry.createNPC(EntityType.PLAYER, rank + " - Carregando...");
-                npc.spawn(loc);
-                npc.setProtected(true);
-                npc.data().set(NPC_METADATA_KEY, true);
+                int npcId = npcSection.getInt(key + ".id", -1);
+                NPC npc = null;
 
-                npcSection.set(key + ".id", npc.getId());
+                if (npcId != -1 && registry.getById(npcId) != null) {
+                    npc = registry.getById(npcId);
+                    if (!npc.isSpawned()) npc.spawn(loc);
+                } else {
+                    npc = registry.createNPC(EntityType.PLAYER, "§e#" + rank + " - Carregando...");
+                    npc.spawn(loc);
+                    npc.setProtected(true);
+                    npc.data().set(NPC_METADATA_KEY, true);
+                    npcSection.set(key + ".id", npc.getId());
+                }
+
                 rankedNpcs.put(rank, npc);
 
                 Location hologramLocation = loc.clone().add(0, 2.3, 0);
@@ -185,15 +183,14 @@ public class NPCManager {
                 rankedHolograms.put(rank, hologram);
 
             } catch (Exception e) {
-                plugin.getLogger().severe("Falha ao carregar o NPC de economia: " + key);
                 e.printStackTrace();
             }
         }
+
         saveLocations();
 
         if (!rankedNpcs.isEmpty()) {
-            plugin.getLogger().info(rankedNpcs.size() + " NPCs de Top Money carregados.");
-            Bukkit.getScheduler().runTaskLater(plugin, this::updateRankedNpcs, 40L);
+            Bukkit.getScheduler().runTaskLater(plugin, this::updateRankedNpcs, 60L);
         }
     }
 

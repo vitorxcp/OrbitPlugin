@@ -92,9 +92,13 @@ public class SyncCordVX extends JavaPlugin {
         punishmentManager = new PunishmentManager(this, databaseManager);
         botManager = new BotManager(this);
         this.chunkManager = new ChunkManager(this);
-        this.rankupNpcManager = new RankupNPCManager(this);
         this.linkDAO = new LinkDAO(this, databaseManager);
         this.linkManager = new LinkManager(this);
+
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            this.rankupNpcManager = new RankupNPCManager(this);
+            this.npcManager = new NPCManager(this);
+        }, 40L);
 
         if (getServer().getPluginManager().getPlugin("WorldGuard") != null) {
             getLogger().info("WorldGuard encontrado! Ativando sistema de proteção de construção.");
@@ -119,9 +123,11 @@ public class SyncCordVX extends JavaPlugin {
         new SlimePadParticleTask(this).runTaskTimer(this, 100L, 20L);
 
         if (getServer().getPluginManager().getPlugin("Citizens") != null && getServer().getPluginManager().getPlugin("HolographicDisplays") != null) {
-            this.npcManager = new NPCManager(this);
+            Bukkit.getScheduler().runTaskLater(this, () -> {
             new NPCRankUpdater(this).runTaskTimerAsynchronously(this, 40L, 5 * 60 * 20L);
             new RankupNPCUpdater(this).runTaskTimerAsynchronously(this, 60L, 5 * 60 * 20L);
+            }, 40L);
+
             getCommand("setnpcrank").setExecutor(new SetNPCRankCommand(this));
             getCommand("reloadrankupnpc").setExecutor(new ReloadRankupNPCCommand(this));
             getCommand("reloadnpcs").setExecutor(new ReloadNPCsCommand(this));
@@ -162,7 +168,6 @@ public class SyncCordVX extends JavaPlugin {
 
         if (npcManager != null) {
             npcManager.shutdown();
-            getLogger().info("Sistema de NPCs finalizado.");
         }
 
         if (botManager != null) {
