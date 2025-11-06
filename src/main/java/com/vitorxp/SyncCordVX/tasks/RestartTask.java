@@ -39,7 +39,7 @@ public class RestartTask extends BukkitRunnable {
             AvisoRestartCommand.currentTask = null;
 
             for (Player player : Bukkit.getOnlinePlayers()) {
-                player.kickPlayer(ChatColor.translateAlternateColorCodes('&', "&cO servidor está reiniciando!\n&aVoltamos em breve."));
+                player.kickPlayer(ChatColor.translateAlternateColorCodes('&', "&c&lREINICIANDO SERVIDOR\n&7O servidor está reiniciando no momento, aguarde alguns minutos para entrar no servidor..."));
             }
 
             Bukkit.shutdown();

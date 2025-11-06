@@ -39,15 +39,48 @@ public class ConfigManager {
                 .replace("%player%", punishment.getPlayerName())
                 .replace("%reason%", punishment.getReason())
                 .replace("%staff%", punishment.getStaffName())
-                .replace("%tempo%", formatTime(punishment.getDuration()));
+                .replace("%tempo%", formatTime(punishment.getDuration()))
+                .replace("%date%", formatDate(punishment.getStartTime()))
+                .replace("%time%", formatTime(punishment.getDuration()));
     }
 
     private String formatTime(long duration) {
         if (duration == -1) {
             return "Permanente";
         }
-        return "Temporário";
+
+        if (duration > 1000000000L) {
+            duration /= 1000;
+        } else if (duration > 1000) {
+            duration /= 1000;
+        }
+
+        long days = duration / 86400;
+        long hours = (duration % 86400) / 3600;
+        long minutes = (duration % 3600) / 60;
+        long seconds = duration % 60;
+
+        StringBuilder sb = new StringBuilder();
+
+        if (days > 0) sb.append(days).append("d ");
+        if (hours > 0) sb.append(hours).append("h ");
+        if (minutes > 0) sb.append(minutes).append("m ");
+        if (seconds > 0 || sb.length() == 0) sb.append(seconds).append("s");
+
+        return sb.toString().trim();
     }
+
+
+    private String formatDate(long timestamp) {
+        if (timestamp <= 0) {
+            return "Data inválida";
+        }
+
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
+        java.util.Date date = new java.util.Date(timestamp);
+        return sdf.format(date);
+    }
+
 
     public ConfigurationSection getDiscordEmbedAddPunishment() {
         return plugin.getConfig().getConfigurationSection("discord.embeds.addpunishments");

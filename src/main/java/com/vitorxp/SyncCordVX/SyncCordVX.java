@@ -209,6 +209,7 @@ public class SyncCordVX extends JavaPlugin {
         getCommand("aviso-restart").setExecutor(new AvisoRestartCommand(this));
         getCommand("synccord").setExecutor(new SyncCordCommand(this));
         getCommand("keepchunk").setExecutor(new KeepChunkCommand(this));
+        getCommand("fw").setExecutor(new FireworkCommand(this));
     }
 
     private void registerListeners() {

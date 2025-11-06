@@ -103,7 +103,7 @@ public class NPCManager {
                     double balance = entry.getValue();
                     String formattedBalance = String.format("%,.2f", balance);
 
-                    npc.setName("§e#" + i + " - " + playerName);
+                    npc.setName(playerName);
                     updateNpcSkin(npc, playerName);
 
                     hologram.clearLines();
@@ -111,7 +111,7 @@ public class NPCManager {
                     hologram.appendTextLine("§f" + playerName);
                     hologram.appendTextLine("§a$" + formattedBalance);
                 } else {
-                    npc.setName("§7#" + i + " - Vazio");
+                    npc.setName("Vazio");
                     updateNpcSkin(npc, "Steve");
 
                     hologram.clearLines();

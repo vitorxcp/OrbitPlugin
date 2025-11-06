@@ -6,6 +6,9 @@ depend: [ProtocolLib, Citizens, HolographicDisplays, JH_Economy, Vault, WorldGua
 softdepend: []
 
 commands:
+  fw:
+    description: Lança fogos de artifício.
+    usage: /fw
   build:
     description: Ativa/Desativa o modo de construção para a staff.
     aliases: [ buildmode ]
